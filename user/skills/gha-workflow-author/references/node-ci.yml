@@ -1,0 +1,31 @@
+# Node/npm CI. After copying: adjust scripts, then run `pin-actions --write`.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@LATEST
+      - uses: actions/setup-node@LATEST
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint --if-present
+      - run: npm test --if-present
+      - run: npm run build --if-present
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high

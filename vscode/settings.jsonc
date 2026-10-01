@@ -1,0 +1,51 @@
+// Merge into your VS Code USER settings (Ctrl/Cmd+Shift+P -> "Preferences: Open User Settings (JSON)").
+// Setting names change between VS Code releases: if one shows as "Unknown Configuration Setting", search for it in the Settings UI.
+{
+  // Inline completions: on for code/config, off where they're just noise.
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": true,
+    "scminput": false
+  },
+
+  // Load instruction files and skills.
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "chat.useAgentSkills": true,
+
+  // Cap runaway agent loops (each tool round-trip re-sends the context = credits).
+  "chat.agent.maxRequests": 15,
+
+  // Keep generated/vendored/huge files out of agent search results (search snippets cost tokens too).
+  "search.exclude": {
+    "**/.terraform": true,
+    "**/*.tfstate": true,
+    "**/*.tfstate.*": true,
+    "**/tfplan": true,
+    "**/*.tfplan": true,
+    "**/node_modules": true,
+    "**/package-lock.json": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/coverage": true,
+    "**/*.log": true
+  },
+
+  // Terminal commands the agent may run without asking (true) or must always ask for (false).
+  // Regexes are anchored on purpose: a plain "npm audit" prefix would also approve "npm audit fix --force".
+  "chat.tools.terminal.autoApprove": {
+    "/^terraform (fmt|validate)\\b/": true,
+    "/^tflint\\b/": true,
+    "/^actionlint\\b/": true,
+    "/^git (status|diff|log|show)\\b/": true,
+    "/^npm (ls|explain|outdated|view)\\b/": true,
+    "/^gh run (list|view)\\b/": true,
+    "/^(bash )?\\S*(tf-plan-summary|gha-failed-log|npm-audit-summary)(\\.sh)?( |$)/": true,
+
+    "/^terraform (apply|destroy|import|state|force-unlock|taint|untaint)\\b/": false,
+    "/^git push\\b/": false,
+    "/^gh (run rerun|workflow run|pr merge|release)\\b/": false,
+    "/^npm (publish|audit fix)\\b/": false,
+    "/^(rm|kubectl delete|helm uninstall)\\b/": false
+  }
+}
